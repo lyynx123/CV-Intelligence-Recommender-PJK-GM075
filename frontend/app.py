@@ -319,11 +319,8 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
-    backend_url = st.text_input(
-        "Backend API URL",
-        value="http://127.0.0.1:8000",
-        help="URL dimana backend FastAPI berjalan"
-    )
+    # Gunakan hardcoded URL karena berjalan di Docker Container yang sama (Hugging Face Spaces)
+    backend_url = "http://127.0.0.1:8000"
 
 # ============================================================
 # MAIN CONTENT
