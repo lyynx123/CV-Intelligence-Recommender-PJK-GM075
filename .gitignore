@@ -41,3 +41,4 @@ chromadb_store/
 # Data (large files)
 data/raw/*.csv
 data/raw/*.zip
+data/processed/*.csv

@@ -11,7 +11,6 @@ Usage:
 """
 
 import os
-import sys
 import pandas as pd
 import re
 
@@ -170,11 +169,7 @@ def process_linkedin_dataset(job_path: str, company_path: str = None) -> pd.Data
     # Remove duplicates
     processed = processed.drop_duplicates(subset=["title", "description"]).reset_index(drop=True)
 
-    # Limit to manageable size
-    if len(processed) > 10000:
-        print(f"   📌 Sampling 10,000 from {len(processed)} rows for performance...")
-        processed = processed.sample(n=10000, random_state=42).reset_index(drop=True)
-
+    # Do not limit size - use full dataset as requested
     print(f"\n✅ Processed: {len(processed)} job listings")
     return processed
 

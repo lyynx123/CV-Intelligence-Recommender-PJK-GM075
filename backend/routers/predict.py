@@ -112,12 +112,12 @@ def _estimate_salary(predicted_job: str, skills: list[str]) -> dict:
 
     # Find best match
     default_range = {"min": 7_000_000, "max": 18_000_000}
-    salary = default_range
+    salary = default_range.copy()
 
     predicted_lower = predicted_job.lower()
     for key, value in salary_ranges.items():
         if key.lower() in predicted_lower or predicted_lower in key.lower():
-            salary = value
+            salary = value.copy()
             break
 
     # Adjust based on skill count

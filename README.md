@@ -50,7 +50,7 @@ CV-IR bertindak sebagai **"painkiller"** bagi pencari kerja dengan:
 1. **Membaca CV secara otomatis** — Ekstraksi teks dari PDF menggunakan PyMuPDF
 2. **Mengidentifikasi skill** — 150+ skill keywords + Named Entity Recognition (spaCy)
 3. **Memprediksi pekerjaan yang cocok** — Machine Learning classifier (TF-IDF + Random Forest)
-4. **Merekomendasikan lowongan** — Cosine similarity matching terhadap 10,000+ lowongan LinkedIn
+4. **Merekomendasikan lowongan** — Cosine similarity matching terhadap 110,000+ lowongan LinkedIn
 5. **Memberikan estimasi gaji** — Berdasarkan kategori pekerjaan dan jumlah skill
 
 ---
@@ -96,7 +96,7 @@ CV-IR bertindak sebagai **"painkiller"** bagi pencari kerja dengan:
                                        │
                           ┌────────────▼────────────┐
                           │  Dataset LinkedIn Jobs   │
-                          │  (10,000+ lowongan)      │
+                          │  (110,000+ lowongan)     │
                           └─────────────────────────┘
 ```
 
@@ -142,7 +142,7 @@ cv-ir/
 │   │   ├── companies/             # Data perusahaan
 │   │   └── jobs/                  # Data skill, gaji, industri
 │   └── processed/
-│       └── job_listings.csv       # 10,000 lowongan bersih
+│       └── job_listings.csv       # 110,837 lowongan bersih
 │
 ├── 📂 models/
 │   ├── job_classifier.pkl         # Trained Random Forest model

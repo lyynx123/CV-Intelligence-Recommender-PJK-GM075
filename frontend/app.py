@@ -245,20 +245,6 @@ st.markdown("""
         color: #94a3b8;
     }
 
-    /* ── Progress Animation ── */
-    .analyzing-animation {
-        text-align: center;
-        padding: 2rem;
-    }
-    .analyzing-animation .spinner {
-        font-size: 3rem;
-        animation: spin 2s linear infinite;
-    }
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
     /* ── Button Override ── */
     .stButton > button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -303,21 +289,21 @@ with st.sidebar:
 
     st.markdown("""
     <div class="sidebar-info">
-        <strong>📋 Cara Penggunaan:</strong><br><br>
+        <strong>Cara Penggunaan:</strong><br><br>
         1. Upload CV dalam format PDF<br>
-        2. Klik tombol "🚀 Analisis CV Saya"<br>
+        2. Klik tombol "Analisis CV Saya"<br>
         3. Lihat hasil rekomendasi pekerjaan<br>
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown("""
     <div class="sidebar-info">
-        <strong>🛠️ Tech Stack:</strong><br><br>
-        • NLP: spaCy + SBERT<br>
-        • ML: Scikit-Learn<br>
-        • Backend: FastAPI<br>
-        • Frontend: Streamlit<br>
-        • PDF: PyMuPDF<br>
+        <strong>Tech Stack:</strong><br><br>
+        - NLP: spaCy + TF-IDF<br>
+        - ML: Scikit-Learn (Random Forest)<br>
+        - Backend: FastAPI<br>
+        - Frontend: Streamlit<br>
+        - PDF: PyMuPDF<br>
     </div>
     """, unsafe_allow_html=True)
 
@@ -327,16 +313,15 @@ with st.sidebar:
     <div style="text-align: center; padding: 0.5rem 0;">
         <p style="color: #64748b; font-size: 0.75rem;">
             Capstone Project PJK-GM075<br>
-            Pijak × IBM SkillsBuild
+            Pijak x IBM SkillsBuild
         </p>
     </div>
     """, unsafe_allow_html=True)
 
-    # Backend URL Configuration
     st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     backend_url = st.text_input(
-        "🔗 Backend API URL",
-        value="http://localhost:8000",
+        "Backend API URL",
+        value="http://127.0.0.1:8000",
         help="URL dimana backend FastAPI berjalan"
     )
 
@@ -344,21 +329,19 @@ with st.sidebar:
 # MAIN CONTENT
 # ============================================================
 
-# Header
 st.markdown("""
 <div class="main-header">
-    <h1>🎯 CV-Intelligence Recommender</h1>
+    <h1>CV-Intelligence Recommender</h1>
     <p>Upload CV kamu dan dapatkan rekomendasi pekerjaan yang sesuai dengan skill-mu!</p>
 </div>
 <div class="custom-divider"></div>
 """, unsafe_allow_html=True)
 
-# Upload Section
 st.markdown("""
 <div class="upload-section">
     <div class="upload-icon">📄</div>
     <div class="upload-title">Upload CV Kamu</div>
-    <div class="upload-subtitle">Mendukung format PDF • Maksimal 10MB</div>
+    <div class="upload-subtitle">Mendukung format PDF - Maksimal 10MB</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -383,19 +366,16 @@ if uploaded_file:
     </div>
     """, unsafe_allow_html=True)
 
-# Analyze Button
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
-    analyze_clicked = st.button("🚀 Analisis CV Saya", use_container_width=True, disabled=not uploaded_file)
+    analyze_clicked = st.button("Analisis CV Saya", use_container_width=True, disabled=not uploaded_file)
 
 # ============================================================
 # ANALYSIS LOGIC
 # ============================================================
 if analyze_clicked and uploaded_file:
-    # Show analyzing animation
-    with st.spinner("🔍 Menganalisis CV kamu... Mohon tunggu sebentar."):
+    with st.spinner("Menganalisis CV kamu... Mohon tunggu sebentar."):
         try:
-            # Call backend API
             response = requests.post(
                 f"{backend_url}/api/v1/predict",
                 files={"file": (uploaded_file.name, uploaded_file.getvalue(), "application/pdf")},
@@ -405,14 +385,13 @@ if analyze_clicked and uploaded_file:
             if response.status_code == 200:
                 data = response.json()
             else:
-                st.error(f"❌ Error dari server: {response.status_code} — {response.text}")
+                st.error(f"Error dari server: {response.status_code} - {response.text}")
                 data = None
 
         except requests.exceptions.ConnectionError:
-            st.warning("⚠️ Tidak dapat terhubung ke backend. Menampilkan hasil dengan **mode demo**...")
-            # Demo/dummy data for when backend isn't running
+            st.warning("Tidak dapat terhubung ke backend. Menampilkan hasil dengan **mode demo**...")
             data = {
-                "extracted_text": "Tidak terhubung ke backend — ini adalah data demo.",
+                "extracted_text": "Tidak terhubung ke backend - ini adalah data demo.",
                 "skills": ["Python", "Machine Learning", "SQL", "Data Analysis", "TensorFlow",
                            "Pandas", "NumPy", "Deep Learning", "NLP", "Git"],
                 "predicted_job": "Data Scientist",
@@ -423,45 +402,23 @@ if analyze_clicked and uploaded_file:
                     "currency": "IDR"
                 },
                 "job_recommendations": [
-                    {
-                        "title": "Data Scientist",
-                        "company": "Tokopedia",
-                        "location": "Jakarta, Indonesia",
-                        "link": "https://linkedin.com/jobs/data-scientist-tokopedia",
-                        "match_score": 0.94
-                    },
-                    {
-                        "title": "Machine Learning Engineer",
-                        "company": "Gojek",
-                        "location": "Jakarta, Indonesia",
-                        "link": "https://linkedin.com/jobs/ml-engineer-gojek",
-                        "match_score": 0.89
-                    },
-                    {
-                        "title": "AI Research Engineer",
-                        "company": "Bukalapak",
-                        "location": "Bandung, Indonesia",
-                        "link": "https://linkedin.com/jobs/ai-engineer-bukalapak",
-                        "match_score": 0.85
-                    },
-                    {
-                        "title": "Data Analyst",
-                        "company": "Shopee",
-                        "location": "Jakarta, Indonesia",
-                        "link": "https://linkedin.com/jobs/data-analyst-shopee",
-                        "match_score": 0.81
-                    },
-                    {
-                        "title": "NLP Engineer",
-                        "company": "Traveloka",
-                        "location": "Jakarta, Indonesia",
-                        "link": "https://linkedin.com/jobs/nlp-engineer-traveloka",
-                        "match_score": 0.78
-                    }
+                    {"title": "Data Scientist", "company": "Tokopedia", "location": "Jakarta, Indonesia",
+                     "link": "https://linkedin.com/jobs/data-scientist-tokopedia", "match_score": 0.94},
+                    {"title": "Machine Learning Engineer", "company": "Gojek", "location": "Jakarta, Indonesia",
+                     "link": "https://linkedin.com/jobs/ml-engineer-gojek", "match_score": 0.89},
+                    {"title": "AI Research Engineer", "company": "Bukalapak", "location": "Bandung, Indonesia",
+                     "link": "https://linkedin.com/jobs/ai-engineer-bukalapak", "match_score": 0.85},
+                    {"title": "Data Analyst", "company": "Shopee", "location": "Jakarta, Indonesia",
+                     "link": "https://linkedin.com/jobs/data-analyst-shopee", "match_score": 0.81},
+                    {"title": "NLP Engineer", "company": "Traveloka", "location": "Jakarta, Indonesia",
+                     "link": "https://linkedin.com/jobs/nlp-engineer-traveloka", "match_score": 0.78}
                 ]
             }
+        except requests.exceptions.ReadTimeout:
+            st.error("Request timeout - server terlalu lama merespons. Coba lagi.")
+            data = None
         except Exception as e:
-            st.error(f"❌ Terjadi kesalahan: {str(e)}")
+            st.error(f"Terjadi kesalahan: {str(e)}")
             data = None
 
     # ============================================================
@@ -470,7 +427,6 @@ if analyze_clicked and uploaded_file:
     if data:
         st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
 
-        # ── Prediction Hero Card ──
         confidence_pct = data["confidence"] * 100
         st.markdown(f"""
         <div class="prediction-hero">
@@ -480,7 +436,6 @@ if analyze_clicked and uploaded_file:
         </div>
         """, unsafe_allow_html=True)
 
-        # ── Stats Row ──
         skills_count = len(data["skills"])
         jobs_count = len(data["job_recommendations"])
         top_match = data["job_recommendations"][0]["match_score"] * 100 if data["job_recommendations"] else 0
@@ -502,10 +457,8 @@ if analyze_clicked and uploaded_file:
         </div>
         """, unsafe_allow_html=True)
 
-        # ── Two Column Layout ──
         col_left, col_right = st.columns([1, 1])
 
-        # ── Skills Section ──
         with col_left:
             st.markdown("""
             <div class="section-header">
@@ -526,7 +479,6 @@ if analyze_clicked and uploaded_file:
             </div>
             """, unsafe_allow_html=True)
 
-            # ── Salary Estimate (if available) ──
             if "salary_estimate" in data and data["salary_estimate"]:
                 sal = data["salary_estimate"]
                 sal_min = sal.get("min", 0)
@@ -550,7 +502,7 @@ if analyze_clicked and uploaded_file:
                     <div style="text-align: center;">
                         <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.5rem;">Rentang Gaji Bulanan</div>
                         <div style="font-size: 1.4rem; font-weight: 700; color: #22d3ee;">
-                            {format_currency(sal_min, currency)} — {format_currency(sal_max, currency)}
+                            {format_currency(sal_min, currency)} - {format_currency(sal_max, currency)}
                         </div>
                         <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.5rem;">
                             Berdasarkan skill dan pengalaman yang terdeteksi
@@ -559,7 +511,6 @@ if analyze_clicked and uploaded_file:
                 </div>
                 """, unsafe_allow_html=True)
 
-        # ── Job Recommendations Section ──
         with col_right:
             st.markdown("""
             <div class="section-header">
@@ -587,16 +538,15 @@ if analyze_clicked and uploaded_file:
                     <div style="margin-top: 0.8rem;">
                         <a href="{job["link"]}" target="_blank"
                            style="color: #667eea; text-decoration: none; font-size: 0.85rem; font-weight: 500;">
-                            🔗 Lihat Lowongan →
+                            🔗 Lihat Lowongan
                         </a>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
 
-        # ── Extracted Text Preview ──
         st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
 
-        with st.expander("📝 Preview Teks yang Diekstrak dari CV"):
+        with st.expander("Preview Teks yang Diekstrak dari CV"):
             st.text(data.get("extracted_text", "Tidak tersedia"))
 
 # ============================================================
@@ -607,8 +557,8 @@ st.markdown("""
 <div style="text-align: center; padding: 1rem; color: #475569; font-size: 0.8rem;">
     <p>
         <strong>CV-Intelligence Recommender (CV-IR)</strong> v1.0.0<br>
-        Capstone Project PJK-GM075 | Pijak × IBM SkillsBuild<br>
-        © 2026 Tim PJK-GM075. All rights reserved.
+        Capstone Project PJK-GM075 | Pijak x IBM SkillsBuild<br>
+        2026 Tim PJK-GM075
     </p>
 </div>
 """, unsafe_allow_html=True)
