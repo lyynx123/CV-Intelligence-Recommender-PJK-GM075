@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import json
 import time
+import re
 
 # ============================================================
 # PAGE CONFIG
@@ -47,33 +48,29 @@ st.markdown("""
         font-weight: 300;
     }
 
-    /* ── Upload Area ── */
-    .upload-section {
-        background: linear-gradient(145deg, #1e293b, #0f172a);
+    /* ── Upload Area (Enlarged) ── */
+    /* Make the Streamlit file uploader larger */
+    [data-testid="stFileUploader"] {
+        width: 100%;
+    }
+    [data-testid="stFileUploader"] section {
+        padding: 2rem;
         border: 2px dashed #334155;
         border-radius: 16px;
-        padding: 2.5rem;
-        text-align: center;
+        background: linear-gradient(145deg, #1e293b, #0f172a);
         transition: all 0.3s ease;
-        margin: 1.5rem 0;
     }
-    .upload-section:hover {
+    [data-testid="stFileUploader"] section:hover {
         border-color: #667eea;
         box-shadow: 0 0 30px rgba(102, 126, 234, 0.15);
     }
-    .upload-icon {
-        font-size: 3rem;
-        margin-bottom: 0.5rem;
-    }
-    .upload-title {
-        font-size: 1.3rem;
+    [data-testid="stFileUploader"] section > button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 0.5rem 1.5rem;
         font-weight: 600;
-        color: #e2e8f0;
-    }
-    .upload-subtitle {
-        font-size: 0.9rem;
-        color: #64748b;
-        margin-top: 0.3rem;
     }
 
     /* ── Result Cards ── */
@@ -245,6 +242,17 @@ st.markdown("""
         color: #94a3b8;
     }
 
+    /* ── Info Badge ── */
+    .info-badge {
+        background: rgba(234, 179, 8, 0.1);
+        border: 1px solid rgba(234, 179, 8, 0.3);
+        border-radius: 10px;
+        padding: 0.7rem 1rem;
+        font-size: 0.8rem;
+        color: #fbbf24;
+        margin-top: 0.5rem;
+    }
+
     /* ── Button Override ── */
     .stButton > button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -275,6 +283,33 @@ st.markdown("""
     header {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
+
+
+# ============================================================
+# CV VALIDATION HELPER
+# ============================================================
+CV_KEYWORDS = [
+    "experience", "education", "skill", "objective", "summary",
+    "work history", "employment", "qualification", "certificate",
+    "university", "degree", "bachelor", "master", "intern",
+    "project", "responsibility", "achievement", "reference",
+    "curriculum vitae", "resume", "personal detail", "contact",
+    "phone", "email", "linkedin", "github", "portfolio",
+    "proficiency", "competence", "training", "course",
+    "pengalaman", "pendidikan", "keahlian", "keterampilan",
+    "riwayat", "sertifikat", "universitas", "magang",
+    "organisasi", "prestasi", "referensi",
+]
+
+def is_likely_cv(text: str) -> bool:
+    """Check if the extracted text is likely a CV/Resume based on keyword presence."""
+    if not text or len(text) < 100:
+        return False
+    text_lower = text.lower()
+    matched = sum(1 for kw in CV_KEYWORDS if kw in text_lower)
+    # Require at least 3 CV-related keywords to be found
+    return matched >= 3
+
 
 # ============================================================
 # SIDEBAR
@@ -307,6 +342,18 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
+    st.markdown("""
+    <div class="sidebar-info" style="background: rgba(234, 179, 8, 0.08); border-color: rgba(234, 179, 8, 0.25);">
+        <strong style="color: #fbbf24;">⚠️ Batasan Sistem:</strong><br><br>
+        <span style="color: #94a3b8;">
+        • Hanya mendukung <strong>25 kategori pekerjaan</strong><br>
+        • Hanya menerima file <strong>CV/Resume</strong> (PDF)<br>
+        • Estimasi gaji bersifat <strong>global</strong><br>
+        • Maksimal ukuran file <strong>10 MB</strong>
+        </span>
+    </div>
+    """, unsafe_allow_html=True)
+
     st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
 
     st.markdown("""
@@ -334,38 +381,36 @@ st.markdown("""
 <div class="custom-divider"></div>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-<div class="upload-section">
-    <div class="upload-icon">📄</div>
-    <div class="upload-title">Upload CV Kamu</div>
-    <div class="upload-subtitle">Mendukung format PDF - Maksimal 10MB</div>
-</div>
-""", unsafe_allow_html=True)
-
+# ── File Uploader (No separate decorative box — uploader IS the box) ──
 uploaded_file = st.file_uploader(
-    "Upload CV (PDF)",
+    "📄 Upload CV kamu (PDF) — Maksimal 10MB",
     type=["pdf"],
-    label_visibility="collapsed",
-    help="Upload CV dalam format PDF. Hanya mendukung PDF digital (bukan hasil scan)."
+    help="Upload CV/Resume dalam format PDF. Hanya mendukung dokumen CV, bukan dokumen lain seperti buku atau artikel.",
 )
 
 if uploaded_file:
     file_size_mb = uploaded_file.size / (1024 * 1024)
-    st.markdown(f"""
-    <div class="result-card" style="border-color: #22d3ee;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <span style="font-size: 1.2rem;">📎</span>
-                <strong style="color: #e2e8f0; margin-left: 0.5rem;">{uploaded_file.name}</strong>
+
+    # ── Validasi ukuran file di frontend ──
+    if file_size_mb > 10:
+        st.error(f"❌ Ukuran file terlalu besar ({file_size_mb:.1f} MB). Maksimal 10 MB.")
+        uploaded_file = None
+    else:
+        st.markdown(f"""
+        <div class="result-card" style="border-color: #22d3ee;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span style="font-size: 1.2rem;">📎</span>
+                    <strong style="color: #e2e8f0; margin-left: 0.5rem;">{uploaded_file.name}</strong>
+                </div>
+                <span style="color: #64748b; font-size: 0.85rem;">{file_size_mb:.2f} MB</span>
             </div>
-            <span style="color: #64748b; font-size: 0.85rem;">{file_size_mb:.2f} MB</span>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
-    analyze_clicked = st.button("Analisis CV Saya", use_container_width=True, disabled=not uploaded_file)
+    analyze_clicked = st.button("🚀 Analisis CV Saya", use_container_width=True, disabled=not uploaded_file)
 
 # ============================================================
 # ANALYSIS LOGIC
@@ -381,6 +426,12 @@ if analyze_clicked and uploaded_file:
 
             if response.status_code == 200:
                 data = response.json()
+
+                # ── Validasi: Apakah ini benar-benar CV? ──
+                extracted_text = data.get("extracted_text", "")
+                if not is_likely_cv(extracted_text):
+                    st.error("❌ **Dokumen ini sepertinya bukan CV/Resume.** Sistem hanya dapat menganalisis dokumen CV atau Resume. Silakan upload file CV yang benar.")
+                    data = None
             else:
                 st.error(f"Error dari server: {response.status_code} - {response.text}")
                 data = None
@@ -388,7 +439,7 @@ if analyze_clicked and uploaded_file:
         except requests.exceptions.ConnectionError:
             st.warning("Tidak dapat terhubung ke backend. Menampilkan hasil dengan **mode demo**...")
             data = {
-                "extracted_text": "Tidak terhubung ke backend - ini adalah data demo.",
+                "extracted_text": "Tidak terhubung ke backend - ini adalah data demo. Experience in Python, Machine Learning, education university degree.",
                 "skills": ["Python", "Machine Learning", "SQL", "Data Analysis", "TensorFlow",
                            "Pandas", "NumPy", "Deep Learning", "NLP", "Git"],
                 "predicted_job": "Data Scientist",
@@ -430,6 +481,13 @@ if analyze_clicked and uploaded_file:
             <div class="icon">🎯</div>
             <h2>{data["predicted_job"]}</h2>
             <div class="confidence">Tingkat Kepercayaan: {confidence_pct:.1f}%</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # ── Info: 25 kategori ──
+        st.markdown("""
+        <div class="info-badge" style="text-align: center;">
+            ℹ️ Prediksi terbatas pada <strong>25 kategori pekerjaan</strong> yang tersedia dalam dataset training.
         </div>
         """, unsafe_allow_html=True)
 
@@ -497,13 +555,16 @@ if analyze_clicked and uploaded_file:
                 st.markdown(f"""
                 <div class="result-card">
                     <div style="text-align: center;">
-                        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.5rem;">Rentang Gaji Bulanan</div>
+                        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.5rem;">Rentang Gaji Bulanan (Estimasi Global)</div>
                         <div style="font-size: 1.4rem; font-weight: 700; color: #22d3ee;">
                             {format_currency(sal_min, currency)} - {format_currency(sal_max, currency)}
                         </div>
                         <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.5rem;">
                             Berdasarkan skill dan pengalaman yang terdeteksi
                         </div>
+                    </div>
+                    <div class="info-badge" style="margin-top: 0.8rem; text-align: center;">
+                        🌐 Estimasi ini menggunakan <strong>standar gaji global</strong>, bukan spesifik untuk wilayah Indonesia. Angka di atas adalah perkiraan kasar dan bukan jaminan gaji sebenarnya.
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
