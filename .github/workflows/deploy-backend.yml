@@ -17,8 +17,8 @@ jobs:
       - name: Trigger Render Deploy Hook
         run: |
           if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
-            echo "Error: RENDER_DEPLOY_HOOK_URL secret is not set in GitHub repository settings."
-            exit 1
+            echo "Skipping deploy: RENDER_DEPLOY_HOOK_URL secret is not set in GitHub repository settings."
+            exit 0
           fi
           echo "Triggering deployment..."
           curl -s -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
