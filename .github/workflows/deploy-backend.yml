@@ -14,12 +14,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Skip deploy when hook is missing
+        if: ${{ secrets.RENDER_DEPLOY_HOOK_URL == '' }}
+        run: echo "RENDER_DEPLOY_HOOK_URL is not set. Skipping Render deploy trigger."
+
       - name: Trigger Render Deploy Hook
+        if: ${{ secrets.RENDER_DEPLOY_HOOK_URL != '' }}
         run: |
-          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
-            echo "Error: RENDER_DEPLOY_HOOK_URL secret is not set in GitHub repository settings."
-            exit 1
-          fi
           echo "Triggering deployment..."
-          curl -s -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+          curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
           echo "Deployment triggered successfully!"
