@@ -33,7 +33,7 @@ pinned: false
 - [Arsitektur Sistem](#-arsitektur-sistem)
 - [Tech Stack](#-tech-stack)
 - [Struktur Folder](#-struktur-folder)
-- [Cara Instalasi](#-cara-instalasi)
+- [Cara Instalasi (Windows)](#-cara-instalasi-windows)
 - [Cara Menjalankan](#-cara-menjalankan)
 - [API Documentation](#-api-documentation)
 - [Dataset](#-dataset)
@@ -59,7 +59,7 @@ CV-IR bertindak sebagai **"painkiller"** bagi pencari kerja dengan:
 2. **Mengidentifikasi skill** — 150+ skill keywords + Named Entity Recognition (spaCy)
 3. **Memprediksi pekerjaan yang cocok** — Machine Learning classifier (TF-IDF + Random Forest)
 4. **Merekomendasikan lowongan** — Cosine similarity matching terhadap 110,000+ lowongan LinkedIn
-5. **Memberikan estimasi gaji** — Berdasarkan kategori pekerjaan dan jumlah skill
+5. **Memberikan estimasi gaji** — Berdasarkan kategori pekerjaan dan jumlah skill (estimasi global)
 
 ---
 
@@ -67,13 +67,15 @@ CV-IR bertindak sebagai **"painkiller"** bagi pencari kerja dengan:
 
 | Fitur | Deskripsi |
 |-------|-----------|
-| 📄 **Upload CV (PDF)** | Drag & drop atau browse file CV dalam format PDF |
+| 📄 **Upload CV (PDF)** | Drag & drop atau browse file CV dalam format PDF (maks. 10MB) |
 | 🛠️ **Skill Detection** | Deteksi otomatis skill teknis dan non-teknis dari teks CV |
-| 🎯 **Job Prediction** | Prediksi kategori pekerjaan yang paling sesuai dengan confidence score |
+| 🎯 **Job Prediction** | Prediksi dari 25 kategori pekerjaan dengan confidence score |
 | 💼 **Job Recommendations** | Top 5 lowongan kerja dari dataset LinkedIn dengan match score |
-| 💰 **Salary Estimation** | Estimasi rentang gaji bulanan berdasarkan profil |
+| 💰 **Salary Estimation** | Estimasi rentang gaji **global** berdasarkan profil |
 | 🔗 **Direct Links** | Link langsung ke posting lowongan di LinkedIn |
 | 🌙 **Dark Mode UI** | Antarmuka modern dengan dark theme premium |
+
+> ⚠️ **Catatan:** Sistem saat ini hanya mendukung **25 kategori pekerjaan** dan **CV berbahasa Inggris**.
 
 ---
 
@@ -122,14 +124,14 @@ CV-IR bertindak sebagai **"painkiller"** bagi pencari kerja dengan:
 | **Feature Engineering** | TF-IDF Vectorizer | Representasi teks sebagai fitur numerik |
 | **Job Matching** | Cosine Similarity (TF-IDF) | Pencocokan CV dengan lowongan |
 | **Data Processing** | Pandas, NumPy | Manipulasi dan analisis data |
-| **Version Control** | Git & GitHub | Kolaborasi dan version control |
+| **Version Control** | Git + GitHub + Git LFS | Kolaborasi, versioning, dan penyimpanan file besar |
 
 ---
 
 ## 📁 Struktur Folder
 
 ```
-cv-ir/
+CV-Intelligence-Recommender-PJK-GM075/
 ├── 📂 backend/
 │   ├── main.py                    # FastAPI entry point
 │   ├── routers/
@@ -146,15 +148,13 @@ cv-ir/
 ├── 📂 data/
 │   ├── raw/                       # Dataset mentah dari Kaggle
 │   │   ├── UpdatedResumeDataSet.csv
-│   │   ├── postings.csv           # 123,849 LinkedIn job postings
-│   │   ├── companies/             # Data perusahaan
-│   │   └── jobs/                  # Data skill, gaji, industri
+│   │   └── postings.csv           # 123,849 LinkedIn job postings
 │   └── processed/
-│       └── job_listings.csv       # 110,837 lowongan bersih
+│       └── job_listings.csv       # 110,837 lowongan bersih (via Git LFS)
 │
 ├── 📂 models/
-│   ├── job_classifier.pkl         # Trained Random Forest model
-│   └── tfidf_vectorizer.pkl       # Trained TF-IDF vectorizer
+│   ├── job_classifier.pkl         # Trained Random Forest model (via Git LFS)
+│   └── tfidf_vectorizer.pkl       # Trained TF-IDF vectorizer (via Git LFS)
 │
 ├── 📂 notebooks/
 │   ├── 01_preprocess_data.py      # Script preprocessing dataset
@@ -163,105 +163,179 @@ cv-ir/
 ├── 📂 tests/
 │   └── test_predict.py            # Unit tests (pytest)
 │
-├── requirements.txt               # Dependencies
-├── .env.example                   # Template environment variables
-├── .gitignore                     # Git ignore configuration
+├── 📂 .streamlit/
+│   └── config.toml                # Konfigurasi Streamlit (max upload 10MB)
+│
+├── Dockerfile                     # Konfigurasi Docker (Hugging Face Spaces)
+├── start.sh                       # Script startup Docker
+├── requirements.txt               # Python dependencies
 └── README.md                      # Dokumentasi (file ini)
 ```
 
 ---
 
-## 🚀 Cara Instalasi
+## 🚀 Cara Instalasi (Windows)
+
+> ✅ **Sudah Tested di Windows 10/11 dengan Python 3.10+**
 
 ### Prasyarat
 
-- **Python** 3.10 atau lebih baru
-- **pip** (package manager Python)
-- **Git**
+Sebelum mulai, pastikan Anda sudah menginstal:
 
-### Langkah Instalasi
+| Software | Versi | Link Download |
+|----------|-------|---------------|
+| **Python** | 3.10 atau lebih baru | [python.org/downloads](https://www.python.org/downloads/) |
+| **Git** | Terbaru | [git-scm.com](https://git-scm.com/downloads) |
+| **Git LFS** | Terbaru | [git-lfs.github.com](https://git-lfs.github.com/) |
 
-```bash
-# 1. Clone repository
-git clone https://github.com/[org]/cv-ir.git
-cd cv-ir
+> ⚠️ **Penting saat install Python:** Centang opsi **"Add Python to PATH"** di awal instalasi!
 
-# 2. Buat virtual environment
+---
+
+### Opsi A — Download via Git Clone (Direkomendasikan)
+
+Gunakan **PowerShell** atau **Command Prompt**:
+
+```powershell
+# 1. Aktifkan Git LFS (wajib, agar file model ikut terdownload)
+git lfs install
+
+# 2. Clone repository
+git clone https://github.com/lyynx123/CV-Intelligence-Recommender-PJK-GM075.git
+
+# 3. Masuk ke folder project
+cd CV-Intelligence-Recommender-PJK-GM075
+
+# 4. Buat virtual environment
 python -m venv venv
 
-# 3. Aktifkan virtual environment
-# Windows:
-venv\Scripts\activate
-# Linux/macOS:
-source venv/bin/activate
+# 5. Aktifkan virtual environment
+.\venv\Scripts\activate
 
-# 4. Install dependencies
+# 6. Install semua dependencies
 pip install -r requirements.txt
 
-# 5. Download model spaCy
+# 7. Download model bahasa spaCy
 python -m spacy download en_core_web_sm
 ```
 
-### Download Dataset (Opsional — jika ingin retrain model)
+---
 
-```bash
-# Install Kaggle CLI
-pip install kaggle
+### Opsi B — Download via ZIP
 
-# Set Kaggle API token
-# Windows PowerShell:
-$env:KAGGLE_TOKEN='your_kaggle_token'
+Jika Anda tidak menggunakan Git, bisa download langsung dari GitHub:
 
-# Download datasets
-kaggle datasets download -d jillanisofttech/updated-resume-dataset -p data/raw --unzip
-kaggle datasets download -d arshkon/linkedin-job-postings -p data/raw --unzip
+1. Buka halaman repo: [github.com/lyynx123/CV-Intelligence-Recommender-PJK-GM075](https://github.com/lyynx123/CV-Intelligence-Recommender-PJK-GM075)
+2. Klik tombol **Code** → **Download ZIP**
+3. Ekstrak ZIP ke folder pilihan Anda
+4. Buka **PowerShell** di dalam folder hasil ekstrak tersebut
 
-# Preprocessing dataset
+> ⚠️ **Catatan penting untuk ZIP:** File model (`.pkl`) dan dataset tersimpan via **Git LFS** dan **tidak ikut terdownload** jika menggunakan ZIP biasa. Anda perlu menjalankan ulang training setelah install, atau gunakan **Opsi A (Git Clone)** agar model langsung tersedia.
+
+```powershell
+# Setelah masuk ke folder hasil ekstrak ZIP:
+
+# 1. Buat virtual environment
+python -m venv venv
+
+# 2. Aktifkan virtual environment
+.\venv\Scripts\activate
+
+# 3. Install semua dependencies
+pip install -r requirements.txt
+
+# 4. Download model bahasa spaCy
+python -m spacy download en_core_web_sm
+
+# 5. (Hanya jika download ZIP) Jalankan preprocessing dan training ulang
 python notebooks/01_preprocess_data.py
-
-# Training model
 python notebooks/02_train_model.py
+```
+
+---
+
+### Troubleshooting Instalasi Windows
+
+**❌ Error: `python` tidak dikenali**
+```powershell
+# Coba gunakan 'py' sebagai pengganti 'python'
+py -m venv venv
+py -m spacy download en_core_web_sm
+```
+
+**❌ Error: `.\venv\Scripts\activate` tidak bisa dijalankan (Execution Policy)**
+```powershell
+# Jalankan perintah ini terlebih dahulu, lalu coba lagi
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+**❌ Error saat `pip install` (SSL / timeout)**
+```powershell
+# Gunakan mirror pip yang lebih stabil
+pip install -r requirements.txt -i https://pypi.org/simple/ --timeout=120
+```
+
+**❌ Error: `No module named 'backend'`**
+```powershell
+# Pastikan Anda menjalankan perintah dari folder root project (bukan dari subfolder)
+# Contoh yang benar:
+cd CV-Intelligence-Recommender-PJK-GM075
+uvicorn backend.main:app --port 8000
+```
+
+**❌ Error: Model `.pkl` tidak ditemukan**
+```powershell
+# Jika download via ZIP, jalankan training ulang:
+python notebooks/02_train_model.py
+# Atau clone ulang menggunakan Git + Git LFS (Opsi A)
 ```
 
 ---
 
 ## 🖥️ Cara Menjalankan
 
-### 1. Jalankan Backend (Terminal 1)
+Setelah instalasi selesai, buka **dua terminal** secara bersamaan:
 
-```bash
-cd "d:\Project\Project Capstone"
-.\venv\Scripts\Activate.ps1
-uvicorn backend.main:app --reload --port 8000
+### Terminal 1 — Jalankan Backend
+
+```powershell
+# Aktifkan virtual environment
+.\venv\Scripts\activate
+
+# Jalankan server FastAPI
+uvicorn backend.main:app --port 8000
 ```
 
-### 2. Jalankan Frontend (Terminal 2)
+Tunggu hingga muncul pesan: `Uvicorn running on http://127.0.0.1:8000`
 
-```bash
-cd "d:\Project\Project Capstone"
-.\venv\Scripts\Activate.ps1
+### Terminal 2 — Jalankan Frontend
+
+```powershell
+# Aktifkan virtual environment
+.\venv\Scripts\activate
+
+# Jalankan aplikasi Streamlit
 streamlit run frontend/app.py --server.port 8501
 ```
 
-### 3. Akses Aplikasi
+### Akses Aplikasi di Browser
 
 | Service | URL |
 |---------|-----|
-| 🎯 **Frontend** | [http://localhost:8501](http://localhost:8501) |
+| 🎯 **Frontend (Aplikasi Utama)** | [http://localhost:8501](http://localhost:8501) |
 | ⚡ **Backend API** | [http://localhost:8000](http://localhost:8000) |
 | 📚 **API Docs (Swagger)** | [http://localhost:8000/docs](http://localhost:8000/docs) |
-| 📖 **API Docs (ReDoc)** | [http://localhost:8000/redoc](http://localhost:8000/redoc) |
 
-### 4. Cara Menggunakan
+### Cara Menggunakan
 
 1. Buka **http://localhost:8501** di browser
-2. Upload CV dalam format **PDF**
+2. **Upload CV** dalam format PDF (maks. 10MB, hanya CV berbahasa Inggris)
 3. Klik tombol **"🚀 Analisis CV Saya"**
 4. Lihat hasil:
-   - 🎯 Prediksi pekerjaan + confidence score
+   - 🎯 Prediksi pekerjaan + confidence score (dari 25 kategori)
    - 🛠️ Skill yang terdeteksi
    - 💼 Top 5 rekomendasi lowongan kerja
-   - 💰 Estimasi rentang gaji
+   - 💰 Estimasi rentang gaji global
 
 ---
 
@@ -300,18 +374,6 @@ curl -X POST http://localhost:8000/api/v1/predict \
       "match_score": 0.8912
     }
   ]
-}
-```
-
-### `GET /`
-
-Health check endpoint.
-
-```json
-{
-  "status": "CV-IR API is running 🚀",
-  "version": "1.0.0",
-  "docs": "/docs"
 }
 ```
 
@@ -401,21 +463,16 @@ CV Text → Text Cleaning → TF-IDF Vectorization → Random Forest → Predict
 
 ## 🧪 Testing
 
-```bash
+```powershell
+# Aktifkan virtual environment terlebih dahulu
+.\venv\Scripts\activate
+
 # Jalankan semua unit tests
 pytest tests/ -v --tb=short
 
 # Test spesifik
 pytest tests/test_predict.py -v
 ```
-
-### Variasi CV untuk Testing Manual
-
-- [ ] CV fresh graduate (sedikit pengalaman)
-- [ ] CV senior engineer (banyak skill teknis)
-- [ ] CV desainer (skill non-teknis)
-- [ ] CV multibahasa (Indonesia + Inggris)
-- [ ] CV dengan format beragam (1 kolom, 2 kolom)
 
 ---
 
