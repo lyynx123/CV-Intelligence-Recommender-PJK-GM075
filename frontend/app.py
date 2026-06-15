@@ -303,12 +303,12 @@ CV_KEYWORDS = [
 
 def is_likely_cv(text: str) -> bool:
     """Check if the extracted text is likely a CV/Resume based on keyword presence."""
-    if not text or len(text) < 100:
+    if not text or len(text) < 50:
         return False
     text_lower = text.lower()
     matched = sum(1 for kw in CV_KEYWORDS if kw in text_lower)
-    # Require at least 3 CV-related keywords to be found
-    return matched >= 3
+    # Require at least 1 CV-related keyword to be found (very lenient)
+    return matched >= 1
 
 
 # ============================================================
