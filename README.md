@@ -1,361 +1,137 @@
----
 title: CV Intelligence Recommender
 emoji: 🎯
 colorFrom: blue
 colorTo: purple
 sdk: docker
-pinned: false
----
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
-  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI">
-  <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit">
-  <img src="https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="Scikit-learn">
-  <img src="https://img.shields.io/badge/spaCy-09A3D5?style=for-the-badge&logo=spacy&logoColor=white" alt="spaCy">
-</p>
-
-<h1 align="center">🎯 CV-Intelligence Recommender</h1>
-
-<p align="center">
-  <strong>Sistem Rekomendasi Pekerjaan Berbasis AI — Cukup Upload CV, Dapatkan Karir Impianmu!</strong>
-</p>
-
-<p align="center">
-  <em>Capstone Project PJK-GM075 | Pijak × IBM SkillsBuild</em>
-</p>
-
----
-
-## 📋 Daftar Isi
-
-- [Tentang Proyek](#-tentang-proyek)
-- [Fitur Utama](#-fitur-utama)
-- [Arsitektur Sistem](#-arsitektur-sistem)
-- [Tech Stack](#-tech-stack)
-- [Struktur Folder](#-struktur-folder)
-- [Cara Instalasi (Windows)](#-cara-instalasi-windows)
-- [Cara Menjalankan](#-cara-menjalankan)
-- [API Documentation](#-api-documentation)
-- [Dataset](#-dataset)
-- [Performa Model](#-performa-model)
-- [Tim Pengembang](#-tim-pengembang)
-- [Lisensi](#-lisensi)
-
----
-
-## 💡 Tentang Proyek
-
-**CV-Intelligence Recommender (CV-IR)** adalah aplikasi berbasis AI yang membantu pencari kerja menemukan pekerjaan yang paling sesuai dengan kualifikasi mereka — hanya dengan mengunggah CV dalam format PDF.
-
-### 🎯 Masalah yang Diselesaikan
-
-> *Pencari kerja membuang terlalu banyak waktu dan tenaga untuk menyaring lowongan secara manual yang seringkali tidak relevan, serta kesulitan menentukan ekspektasi gaji yang objektif berdasarkan kompetensi pada CV mereka.*
-
-### 💊 Solusi Kami
-
-CV-IR bertindak sebagai **"painkiller"** bagi pencari kerja dengan:
-
-1. **Membaca CV secara otomatis** — Ekstraksi teks dari PDF menggunakan PyMuPDF
-2. **Mengidentifikasi skill** — 150+ skill keywords + Named Entity Recognition (spaCy)
-3. **Memprediksi pekerjaan yang cocok** — Machine Learning classifier (TF-IDF + Random Forest)
-4. **Merekomendasikan lowongan** — Cosine similarity matching terhadap 110,000+ lowongan LinkedIn
-5. **Memberikan estimasi gaji** — Berdasarkan kategori pekerjaan dan jumlah skill (estimasi global)
-
----
-
-## ✨ Fitur Utama
-
-| Fitur | Deskripsi |
-|-------|-----------|
-| 📄 **Upload CV (PDF)** | Drag & drop atau browse file CV dalam format PDF (maks. 10MB) |
-| 🛠️ **Skill Detection** | Deteksi otomatis skill teknis dan non-teknis dari teks CV |
-| 🎯 **Job Prediction** | Prediksi dari 25 kategori pekerjaan dengan confidence score |
-| 💼 **Job Recommendations** | Top 5 lowongan kerja dari dataset LinkedIn dengan match score |
-| 💰 **Salary Estimation** | Estimasi rentang gaji **global** berdasarkan profil |
-| 🔗 **Direct Links** | Link langsung ke posting lowongan di LinkedIn |
-| 🌙 **Dark Mode UI** | Antarmuka modern dengan dark theme premium |
-
-> ⚠️ **Catatan:** Sistem saat ini hanya mendukung **25 kategori pekerjaan** dan **CV berbahasa Inggris**.
-
----
-
-## 🏗️ Arsitektur Sistem
-
-```
-┌──────────────────────────────────────────────────────────┐
-│                   FRONTEND (Streamlit)                     │
-│  • Upload CV (PDF)           • Tampil Skill Badges        │
-│  • Tampil Prediksi Pekerjaan • Tampil Rekomendasi         │
-│  • Tampil Estimasi Gaji      • Dark Theme Premium         │
+pinned: false📋 Table of ContentsAbout The ProjectKey FeaturesSystem ArchitectureTech StackFolder StructureInstallation Guide (Windows)How to RunAPI DocumentationDatasetModel PerformanceDevelopment TeamLicense💡 About The ProjectCV-Intelligence Recommender (CV-IR) is an AI-powered application that helps job seekers find the most suitable job opportunities based on their qualifications — simply by uploading a CV in PDF format.🎯 Problem StatementJob seekers waste excessive time and effort manually filtering through job postings that are often irrelevant, while also struggling to determine objective salary expectations based on their CV skills.💊 Our SolutionCV-IR acts as a "painkiller" for job seekers by:Automatically parsing CVs — Text extraction from PDF using PyMuPDFIdentifying skills — 150+ skill keywords + Named Entity Recognition (spaCy)Predicting job roles — Machine Learning classifier (TF-IDF + Random Forest)Recommending job postings — Cosine similarity matching against 110,000+ LinkedIn job listingsProviding salary estimates — Based on job category and skill count (global estimates)✨ Key FeaturesFeatureDescription📄 Upload CV (PDF)Drag & drop or browse CV files in PDF format (max 10MB)🛠️ Skill DetectionAutomatic extraction of technical and non-technical skills from CV text🎯 Job PredictionPrediction across 25 job categories with confidence scores💼 Job RecommendationsTop 5 job openings from LinkedIn dataset with match scores💰 Salary EstimationGlobal salary range estimation based on candidate profile🔗 Direct LinksDirect links to job postings on LinkedIn🌙 Dark Mode UIModern interface with a premium dark theme⚠️ Note: The system currently supports 25 job categories and English CVs only.🏗️ System Architecture┌──────────────────────────────────────────────────────────┐
+│                    FRONTEND (Streamlit)                  │
+│  • Upload CV (PDF)           • Display Skill Badges      │
+│  • Display Job Prediction    • Display Recommendations   │
+│  • Display Salary Estimate   • Dark Theme Premium        │
 └────────────────────────┬─────────────────────────────────┘
                          │ HTTP POST /api/v1/predict
                          ▼
 ┌──────────────────────────────────────────────────────────┐
-│                   BACKEND (FastAPI)                        │
-│  • Validasi file PDF        • Pipeline orchestration      │
-│  • Error handling           • CORS middleware             │
+│                    BACKEND (FastAPI)                     │
+│  • Validate PDF file         • Pipeline orchestration    │
+│  • Error handling            • CORS middleware           │
 └───┬──────────┬──────────┬──────────┬─────────────────────┘
     │          │          │          │
     ▼          ▼          ▼          ▼
 ┌────────┐ ┌────────┐ ┌────────┐ ┌────────────┐
 │  PDF   │ │ Skill  │ │  Job   │ │    Job     │
 │Extract │→│Extract │→│Predict │ │  Matcher   │
-│(PyMuPDF)│ │(spaCy) │ │(RF+   │ │(TF-IDF    │
-│        │ │        │ │TF-IDF)│ │Cosine Sim) │
+│(PyMuPDF)│ │(spaCy) │ │(RF+    │ │(TF-IDF     │
+│        │ │        │ │TF-IDF) │ │Cosine Sim) │
 └────────┘ └────────┘ └────────┘ └────────────┘
-                                       │
-                          ┌────────────▼────────────┐
-                          │  Dataset LinkedIn Jobs   │
-                          │  (110,000+ lowongan)     │
-                          └─────────────────────────┘
-```
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Teknologi | Kegunaan |
-|-------|-----------|----------|
-| **Frontend** | Streamlit | Antarmuka web interaktif |
-| **Backend** | FastAPI + Uvicorn | REST API server |
-| **PDF Parsing** | PyMuPDF (`fitz`) | Ekstraksi teks dari PDF |
-| **NLP / NER** | spaCy (`en_core_web_sm`) | Named Entity Recognition |
-| **ML Classifier** | Scikit-Learn (Random Forest) | Prediksi kategori pekerjaan |
-| **Feature Engineering** | TF-IDF Vectorizer | Representasi teks sebagai fitur numerik |
-| **Job Matching** | Cosine Similarity (TF-IDF) | Pencocokan CV dengan lowongan |
-| **Data Processing** | Pandas, NumPy | Manipulasi dan analisis data |
-| **Version Control** | Git + GitHub + Git LFS | Kolaborasi, versioning, dan penyimpanan file besar |
-
----
-
-## 📁 Struktur Folder
-
-```
-CV-Intelligence-Recommender-PJK-GM075/
+                                     │
+                          ┌──────────▼────────────┐
+                          │  Dataset LinkedIn Jobs│
+                          │  (110,000+ listings)  │
+                          └───────────────────────┘
+🛠️ Tech StackLayerTechnologyUsageFrontendStreamlitInteractive web interfaceBackendFastAPI + UvicornREST API serverPDF ParsingPyMuPDF (fitz)Text extraction from PDFNLP / NERspaCy (en_core_web_sm)Named Entity RecognitionML ClassifierScikit-Learn (Random Forest)Job category predictionFeature EngineeringTF-IDF VectorizerText representation as numerical featuresJob MatchingCosine Similarity (TF-IDF)Matching CVs with job postingsData ProcessingPandas, NumPyData manipulation and analysisVersion ControlGit + GitHub + Git LFSCollaboration, versioning, and large file storage📁 Folder StructureCV-Intelligence-Recommender-PJK-GM075/
 ├── 📂 backend/
-│   ├── main.py                    # FastAPI entry point
+│   ├── main.py                     # FastAPI entry point
 │   ├── routers/
 │   │   └── predict.py             # Endpoint POST /api/v1/predict
 │   └── modules/
-│       ├── pdf_extractor.py       # Ekstraksi teks dari PDF
-│       ├── skill_extractor.py     # Deteksi skill (150+ keywords + NER)
+│       ├── pdf_extractor.py       # Text extraction from PDF
+│       ├── skill_extractor.py     # Skill detection (150+ keywords + NER)
 │       ├── job_matcher.py         # TF-IDF cosine similarity matching
 │       └── job_predictor.py       # Random Forest job classifier
 │
 ├── 📂 frontend/
-│   └── app.py                     # Streamlit UI (dark theme premium)
+│   └── app.py                     # Streamlit UI (premium dark theme)
 │
 ├── 📂 data/
-│   ├── raw/                       # Dataset mentah dari Kaggle
+│   ├── raw/                       # Raw dataset from Kaggle
 │   │   ├── UpdatedResumeDataSet.csv
 │   │   └── postings.csv           # 123,849 LinkedIn job postings
 │   └── processed/
-│       └── job_listings.csv       # 110,837 lowongan bersih (via Git LFS)
+│       └── job_listings.csv       # 110,837 cleaned job postings (via Git LFS)
 │
 ├── 📂 models/
 │   ├── job_classifier.pkl         # Trained Random Forest model (via Git LFS)
 │   └── tfidf_vectorizer.pkl       # Trained TF-IDF vectorizer (via Git LFS)
 │
 ├── 📂 notebooks/
-│   ├── 01_preprocess_data.py      # Script preprocessing dataset
-│   └── 02_train_model.py          # Script training model ML
+│   ├── 01_preprocess_data.py      # Dataset preprocessing script
+│   └── 02_train_model.py          # ML model training script
 │
 ├── 📂 tests/
 │   └── test_predict.py            # Unit tests (pytest)
 │
 ├── 📂 .streamlit/
-│   └── config.toml                # Konfigurasi Streamlit (max upload 10MB)
+│   └── config.toml                # Streamlit configuration (max upload 10MB)
 │
-├── Dockerfile                     # Konfigurasi Docker (Hugging Face Spaces)
-├── start.sh                       # Script startup Docker
+├── Dockerfile                     # Docker configuration (Hugging Face Spaces)
+├── start.sh                       # Docker startup script
 ├── requirements.txt               # Python dependencies
-└── README.md                      # Dokumentasi (file ini)
-```
-
----
-
-## 🚀 Cara Instalasi (Windows)
-
-> ✅ **Sudah Tested di Windows 10/11 dengan Python 3.10+**
-
-### Prasyarat
-
-Sebelum mulai, pastikan Anda sudah menginstal:
-
-| Software | Versi | Link Download |
-|----------|-------|---------------|
-| **Python** | 3.10 atau lebih baru | [python.org/downloads](https://www.python.org/downloads/) |
-| **Git** | Terbaru | [git-scm.com](https://git-scm.com/downloads) |
-| **Git LFS** | Terbaru | [git-lfs.github.com](https://git-lfs.github.com/) |
-
-> ⚠️ **Penting saat install Python:** Centang opsi **"Add Python to PATH"** di awal instalasi!
-
----
-
-### Opsi A — Download via Git Clone (Direkomendasikan)
-
-Gunakan **PowerShell** atau **Command Prompt**:
-
-```powershell
-# 1. Aktifkan Git LFS (wajib, agar file model ikut terdownload)
+└── README.md                      # Documentation (this file)
+🚀 Installation Guide (Windows)✅ Tested on Windows 10/11 with Python 3.10+PrerequisitesBefore starting, ensure you have installed:SoftwareVersionDownload LinkPython3.10 or newerpython.org/downloadsGitLatestgit-scm.comGit LFSLatestgit-lfs.github.com⚠️ Important during Python installation: Check the "Add Python to PATH" option at the start of installation!Option A — Download via Git Clone (Recommended)Using PowerShell or Command Prompt:PowerShell# 1. Enable Git LFS (required so model files are downloaded properly)
 git lfs install
 
-# 2. Clone repository
+# 2. Clone the repository
 git clone https://github.com/lyynx123/CV-Intelligence-Recommender-PJK-GM075.git
 
-# 3. Masuk ke folder project
+# 3. Navigate into the project folder
 cd CV-Intelligence-Recommender-PJK-GM075
 
-# 4. Buat virtual environment
+# 4. Create a virtual environment
 python -m venv venv
 
-# 5. Aktifkan virtual environment
+# 5. Activate the virtual environment
 .\venv\Scripts\activate
 
-# 6. Install semua dependencies
+# 6. Install all dependencies
 pip install -r requirements.txt
 
-# 7. Download model bahasa spaCy
+# 7. Download spaCy language model
 python -m spacy download en_core_web_sm
-```
+Option B — Download via ZIPIf you do not use Git, you can download directly from GitHub:Open the repo page: github.com/lyynx123/CV-Intelligence-Recommender-PJK-GM075Click the Code button → Download ZIPExtract the ZIP into your directory of choiceOpen PowerShell inside the extracted directory⚠️ Important note for ZIP downloads: Model files (.pkl) and datasets are managed via Git LFS and are not included in standard ZIP downloads. You will need to retrain the model after installation, or use Option A (Git Clone) to get pre-trained weights.PowerShell# Inside the extracted ZIP directory:
 
----
-
-### Opsi B — Download via ZIP
-
-Jika Anda tidak menggunakan Git, bisa download langsung dari GitHub:
-
-1. Buka halaman repo: [github.com/lyynx123/CV-Intelligence-Recommender-PJK-GM075](https://github.com/lyynx123/CV-Intelligence-Recommender-PJK-GM075)
-2. Klik tombol **Code** → **Download ZIP**
-3. Ekstrak ZIP ke folder pilihan Anda
-4. Buka **PowerShell** di dalam folder hasil ekstrak tersebut
-
-> ⚠️ **Catatan penting untuk ZIP:** File model (`.pkl`) dan dataset tersimpan via **Git LFS** dan **tidak ikut terdownload** jika menggunakan ZIP biasa. Anda perlu menjalankan ulang training setelah install, atau gunakan **Opsi A (Git Clone)** agar model langsung tersedia.
-
-```powershell
-# Setelah masuk ke folder hasil ekstrak ZIP:
-
-# 1. Buat virtual environment
+# 1. Create a virtual environment
 python -m venv venv
 
-# 2. Aktifkan virtual environment
+# 2. Activate the virtual environment
 .\venv\Scripts\activate
 
-# 3. Install semua dependencies
+# 3. Install all dependencies
 pip install -r requirements.txt
 
-# 4. Download model bahasa spaCy
+# 4. Download spaCy language model
 python -m spacy download en_core_web_sm
 
-# 5. (Hanya jika download ZIP) Jalankan preprocessing dan training ulang
+# 5. (ZIP download only) Run preprocessing and retrain the model
 python notebooks/01_preprocess_data.py
 python notebooks/02_train_model.py
-```
-
----
-
-### Troubleshooting Instalasi Windows
-
-**❌ Error: `python` tidak dikenali**
-```powershell
-# Coba gunakan 'py' sebagai pengganti 'python'
+Windows Installation Troubleshooting❌ Error: python is not recognizedPowerShell# Try using 'py' instead of 'python'
 py -m venv venv
 py -m spacy download en_core_web_sm
-```
-
-**❌ Error: `.\venv\Scripts\activate` tidak bisa dijalankan (Execution Policy)**
-```powershell
-# Jalankan perintah ini terlebih dahulu, lalu coba lagi
+❌ Error: .\venv\Scripts\activate cannot be loaded (Execution Policy)PowerShell# Run this command first, then try activating again
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
-
-**❌ Error saat `pip install` (SSL / timeout)**
-```powershell
-# Gunakan mirror pip yang lebih stabil
+❌ Error during pip install (SSL / timeout)PowerShell# Use a more stable pip mirror or increase timeout
 pip install -r requirements.txt -i https://pypi.org/simple/ --timeout=120
-```
-
-**❌ Error: `No module named 'backend'`**
-```powershell
-# Pastikan Anda menjalankan perintah dari folder root project (bukan dari subfolder)
-# Contoh yang benar:
+❌ Error: No module named 'backend'PowerShell# Ensure you are running the command from the root folder of the project (not a subfolder)
+# Correct example:
 cd CV-Intelligence-Recommender-PJK-GM075
 uvicorn backend.main:app --port 8000
-```
-
-**❌ Error: Model `.pkl` tidak ditemukan**
-```powershell
-# Jika download via ZIP, jalankan training ulang:
+❌ Error: .pkl model file not foundPowerShell# If downloaded via ZIP, run model retraining:
 python notebooks/02_train_model.py
-# Atau clone ulang menggunakan Git + Git LFS (Opsi A)
-```
-
----
-
-## 🖥️ Cara Menjalankan
-
-Setelah instalasi selesai, buka **dua terminal** secara bersamaan:
-
-### Terminal 1 — Jalankan Backend
-
-```powershell
-# Aktifkan virtual environment
+# Or re-clone using Git + Git LFS (Option A)
+🖥️ How to RunAfter installation, open two terminals simultaneously:Terminal 1 — Run BackendPowerShell# Activate virtual environment
 .\venv\Scripts\activate
 
-# Jalankan server FastAPI
+# Run FastAPI server
 uvicorn backend.main:app --port 8000
-```
-
-Tunggu hingga muncul pesan: `Uvicorn running on http://127.0.0.1:8000`
-
-### Terminal 2 — Jalankan Frontend
-
-```powershell
-# Aktifkan virtual environment
+Wait until you see: Uvicorn running on [http://127.0.0.1:8000](http://127.0.0.1:8000)Terminal 2 — Run FrontendPowerShell# Activate virtual environment
 .\venv\Scripts\activate
 
-# Jalankan aplikasi Streamlit
+# Run Streamlit app
 streamlit run frontend/app.py --server.port 8501
-```
-
-### Akses Aplikasi di Browser
-
-| Service | URL |
-|---------|-----|
-| 🎯 **Frontend (Aplikasi Utama)** | [http://localhost:8501](http://localhost:8501) |
-| ⚡ **Backend API** | [http://localhost:8000](http://localhost:8000) |
-| 📚 **API Docs (Swagger)** | [http://localhost:8000/docs](http://localhost:8000/docs) |
-
-### Cara Menggunakan
-
-1. Buka **http://localhost:8501** di browser
-2. **Upload CV** dalam format PDF (maks. 10MB, hanya CV berbahasa Inggris)
-3. Klik tombol **"🚀 Analisis CV Saya"**
-4. Lihat hasil:
-   - 🎯 Prediksi pekerjaan + confidence score (dari 25 kategori)
-   - 🛠️ Skill yang terdeteksi
-   - 💼 Top 5 rekomendasi lowongan kerja
-   - 💰 Estimasi rentang gaji global
-
----
-
-## 📡 API Documentation
-
-### `POST /api/v1/predict`
-
-Upload CV dalam format PDF dan dapatkan analisis lengkap.
-
-**Request:**
-
-```bash
-curl -X POST http://localhost:8000/api/v1/predict \
+Accessing the ApplicationServiceURL🎯 Frontend (Main App)http://localhost:8501⚡ Backend APIhttp://localhost:8000📚 API Docs (Swagger)http://localhost:8000/docsHow to UseOpen http://localhost:8501 in your browserUpload CV in PDF format (max 10MB, English CVs only)Click the "🚀 Analyze My CV" buttonView results:🎯 Job prediction + confidence score (from 25 categories)🛠️ Extracted skills💼 Top 5 recommended job postings💰 Global salary range estimate📡 API DocumentationPOST /api/v1/predictUpload a PDF CV and receive a full analysis.Request:Bashcurl -X POST http://localhost:8000/api/v1/predict \
   -F "file=@path/to/cv.pdf"
-```
-
-**Response:**
-
-```json
-{
+Response:JSON{
   "extracted_text": "John Doe Software Engineer with 5 years...",
   "skills": ["Python", "Machine Learning", "SQL", "TensorFlow", "Docker"],
   "predicted_job": "Data Science",
@@ -375,155 +151,17 @@ curl -X POST http://localhost:8000/api/v1/predict \
     }
   ]
 }
-```
-
----
-
-## 📊 Dataset
-
-| Dataset | Sumber | Jumlah Data | Kegunaan |
-|---------|--------|-------------|----------|
-| **Updated Resume Dataset** | [Kaggle](https://www.kaggle.com/datasets/jillanisofttech/updated-resume-dataset) | 962 resumes, 25 kategori | Training model classifier |
-| **LinkedIn Job Postings** | [Kaggle](https://www.kaggle.com/datasets/arshkon/linkedin-job-postings) | 123,849 postings | Job matching & recommendations |
-
-### 25 Kategori Pekerjaan yang Didukung
-
-<table>
-<tr>
-<td>
-
-| # | Kategori |
-|---|----------|
-| 1 | Java Developer |
-| 2 | Testing |
-| 3 | DevOps Engineer |
-| 4 | Python Developer |
-| 5 | Web Designing |
-| 6 | HR |
-| 7 | Hadoop |
-| 8 | Data Science |
-| 9 | Mechanical Engineer |
-
-</td>
-<td>
-
-| # | Kategori |
-|---|----------|
-| 10 | Sales |
-| 11 | Operations Manager |
-| 12 | ETL Developer |
-| 13 | Blockchain |
-| 14 | Arts |
-| 15 | Database |
-| 16 | Health and Fitness |
-| 17 | Electrical Engineering |
-
-</td>
-<td>
-
-| # | Kategori |
-|---|----------|
-| 18 | PMO |
-| 19 | Business Analyst |
-| 20 | DotNet Developer |
-| 21 | Automation Testing |
-| 22 | Network Security Engineer |
-| 23 | Civil Engineer |
-| 24 | SAP Developer |
-| 25 | Advocate |
-
-</td>
-</tr>
-</table>
-
----
-
-## 📈 Performa Model
-
-Model dilatih menggunakan **TF-IDF + Random Forest** pada 962 resume dengan 25 kategori.
-
-| Metrik | Skor |
-|--------|------|
-| **Accuracy** | **99.5%** |
-| **Precision** (macro avg) | 0.99 |
-| **Recall** (macro avg) | 1.00 |
-| **F1-Score** (macro avg) | 0.99 |
-
-### Metodologi
-
-```
-CV Text → Text Cleaning → TF-IDF Vectorization → Random Forest → Predicted Job Category
+📊 DatasetDatasetSourceData CountPurposeUpdated Resume DatasetKaggle962 resumes, 25 categoriesClassifier model trainingLinkedIn Job PostingsKaggle123,849 postingsJob matching & recommendations25 Supported Job Categories#Category1Java Developer2Testing3DevOps Engineer4Python Developer5Web Designing6HR7Hadoop8Data Science9Mechanical Engineer#Category10Sales11Operations Manager12ETL Developer13Blockchain14Arts15Database16Health and Fitness17Electrical Engineering#Category18PMO19Business Analyst20DotNet Developer21Automation Testing22Network Security Engineer23Civil Engineer24SAP Developer25Advocate📈 Model PerformanceModel trained using TF-IDF + Random Forest on 962 resumes across 25 categories.MetricScoreAccuracy99.5%Precision (macro avg)0.99Recall (macro avg)1.00F1-Score (macro avg)0.99MethodologyCV Text → Text Cleaning → TF-IDF Vectorization → Random Forest → Predicted Job Category
            (lowercase,      (5000 features,        (200 trees,
             remove URLs,     bigrams)               balanced weights)
             remove special
             chars)
-```
-
----
-
-## 🧪 Testing
-
-```powershell
-# Aktifkan virtual environment terlebih dahulu
+🧪 TestingPowerShell# Activate virtual environment first
 .\venv\Scripts\activate
 
-# Jalankan semua unit tests
+# Run all unit tests
 pytest tests/ -v --tb=short
 
-# Test spesifik
+# Run specific test
 pytest tests/test_predict.py -v
-```
-
----
-
-## 👥 Tim Pengembang
-
-<table>
-<tr>
-<td align="center">
-<strong>Ahmad Izzuddin Ulinnuha</strong><br>
-<sub>🔵 Project Leader & AI Integration</sub><br>
-<sub>APC902D6Y0383</sub>
-</td>
-<td align="center">
-<strong>Azka Nur Fadel</strong><br>
-<sub>🟢 Data Engineer</sub><br>
-<sub>APC347D6Y0353</sub>
-</td>
-<td align="center">
-<strong>Alif Khusain Bilfaqih</strong><br>
-<sub>🟡 Machine Learning Engineer</sub><br>
-<sub>APC659D6Y0204</sub>
-</td>
-</tr>
-<tr>
-<td align="center">
-<strong>Muhammad Za'im Shidqi</strong><br>
-<sub>🟠 Backend & API Developer</sub><br>
-<sub>APC324D6Y0185</sub>
-</td>
-<td align="center">
-<strong>Muhammad Zaenal Arifin</strong><br>
-<sub>🔴 Frontend & UI Developer</sub><br>
-<sub>APC338D6Y0449</sub>
-</td>
-<td align="center">
-</td>
-</tr>
-</table>
-
----
-
-## 📄 Lisensi
-
-Proyek ini dikembangkan sebagai bagian dari **Capstone Project** program **Pijak in collaboration with IBM SkillsBuild**.
-
-**Tema**: AI for Smart Recommendation Systems
-
----
-
-<p align="center">
-  <strong>🎯 CV-Intelligence Recommender (CV-IR)</strong><br>
-  <em>Upload CV. Temukan Karir. Raih Masa Depan.</em><br><br>
-  <sub>© 2026 Tim PJK-GM075 — Pijak × IBM SkillsBuild</sub>
-</p>
+👥 Development Team📄 LicenseThis project was developed as part of the Capstone Project for the Pijak in collaboration with IBM SkillsBuild program.Theme: AI for Smart Recommendation Systems
